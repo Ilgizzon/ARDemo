@@ -59,7 +59,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
     
     /// The latest screen touch position when a pan gesture is active
     var lastPanTouchPosition: CGPoint?
-    
+    var autoScale: Bool = true
     init(arSceneView: ARSCNView)
     {
         super.init()
@@ -87,8 +87,8 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
     }
     
     /// Runs the session with a new AR configuration to change modes or reset the experience.
-    func resetTracking(changeMode: Bool = false) {
-
+    func resetTracking(autoScaleMode: Bool = true) {
+        autoScale = autoScaleMode
     }
     
     // MARK: - ARSCNViewDelegate
