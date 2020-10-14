@@ -70,8 +70,9 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         self.infoCallback = messages
     }
 
-    /// Runs the session with a new AR configuration to change modes or reset the experience.
-    func resetTracking(autoScaleMode: Bool = true) {
+    /// Runs the session with a new AR configuration to change modes.
+    func resetTracking(autoScaleMode: Bool = true, environmentMode: ARWorldTrackingConfiguration.EnvironmentTexturing = .automatic) {
+        environmentTexturingMode = environmentMode
         autoScale = autoScaleMode
         sceneView.scene.rootNode.childNodes.forEach{
             $0.removeFromParentNode()
@@ -79,6 +80,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = .horizontal
+        configuration.isLightEstimationEnabled = environmentTexturingMode == .automatic ? true: false
         configuration.environmentTexturing = environmentTexturingMode
         sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
         modelOnScene = false
@@ -195,6 +197,10 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         guard let transition = result.first?.worldTransform.translation else {
             return
         }
+        if environmentTexturingMode != .automatic {
+            sceneView.scene.enableEnvironmentMapWithIntensity(5, queue: DispatchQueue.main)
+        }
+        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else {
                 return

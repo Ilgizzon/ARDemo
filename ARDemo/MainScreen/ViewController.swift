@@ -17,6 +17,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var sessionInfoView: UIVisualEffectView!
     @IBOutlet weak var autoscaleModeSelectionControl: UISegmentedControl!
     @IBOutlet weak var modelSelectionControl: UISegmentedControl!
+    @IBOutlet weak var envSelectionControl: UISegmentedControl!
     
     var viewModel: ViewModelControllerProtocol?
     
@@ -43,7 +44,7 @@ class ViewController: UIViewController {
     
     // MARK: - Session management
     
-    @IBAction func changeMode(_ sender: UISegmentedControl) {
+    @IBAction func changeScaleMode(_ sender: UISegmentedControl) {
         restartARSession()
     }
     
@@ -51,13 +52,20 @@ class ViewController: UIViewController {
         restartARSession()
     }
     
+    @IBAction func changeEnvModel(_ sender: UISegmentedControl) {
+        restartARSession()
+    }
+    
     @IBAction func restartExperience() {
         restartARSession()
     }
     
+    
+    
     func restartARSession(){
         let autoScaleMode = autoscaleModeSelectionControl.selectedSegmentIndex == 0
         var selectedModel: SetCurrentModel = .gramophone
+        let envMode: ARWorldTrackingConfiguration.EnvironmentTexturing = envSelectionControl.selectedSegmentIndex == 0 ? .automatic : .none
         // Remove anchors, change scale mode, set virtual object
         switch modelSelectionControl.selectedSegmentIndex {
         case 0:
@@ -69,7 +77,7 @@ class ViewController: UIViewController {
         default:
             break
         }
-        viewModel?.resetAR(autoScaleMode, model: selectedModel)
+        viewModel?.resetAR(autoScaleMode, model: selectedModel, envMode: envMode)
     }
     private func setupGestures(){
         let rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(self.rotation(_:)))

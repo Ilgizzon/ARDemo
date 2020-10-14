@@ -18,7 +18,7 @@ protocol ViewModelControllerProtocol: class {
     var delegate: ViewControllerDelegate? { get }
     func setupARView(with sceneView: ARSCNView)
     func pauseAR()
-    func resetAR(_ autoScaleMode: Bool, model: SetCurrentModel)
+    func resetAR(_ autoScaleMode: Bool, model: SetCurrentModel, envMode: ARWorldTrackingConfiguration.EnvironmentTexturing)
     func tap(_ gesture: UITapGestureRecognizer)
     func pan(_ gesture: UIPanGestureRecognizer)
     func pinch(_ gesture: UIPinchGestureRecognizer)

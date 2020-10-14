@@ -60,3 +60,21 @@ extension float4x4 {
         return SIMD3<Float>(translation.x, translation.y, translation.z)
     }
 }
+
+// MARK: - Scene extensions
+
+extension SCNScene {
+    func enableEnvironmentMapWithIntensity(_ intensity: CGFloat, queue: DispatchQueue) {
+        queue.async {  [weak self] in
+            
+            guard let self = self else {
+                return
+            }
+            if self.lightingEnvironment.contents == nil {
+                let environmentMap = UIImage(named: "art.scnassets/environment.jpg")
+                self.lightingEnvironment.contents = environmentMap
+            }
+            self.lightingEnvironment.intensity = intensity
+        }
+    }
+}
