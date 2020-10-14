@@ -6,6 +6,39 @@
 //
 
 import Foundation
+import ARKit
 class StorageManager {
     
+    public static let shared = StorageManager()
+    /// Loading model
+    func load(modelName: String, completion: @escaping (Result<SCNNode, Error>) -> Void){
+        guard let parsedName = parseName(modelName: modelName) else {
+            let error = NSError(domain: "wrong model name", code: 0, userInfo: nil)
+            completion(.failure(error))
+            return
+        }
+        
+        guard let sceneURL = Bundle.main.url(forResource: parsedName.name, withExtension: parsedName.extension, subdirectory: "art.scnassets"),
+              let referenceNode = SCNReferenceNode(url: sceneURL) else {
+            let error = NSError(domain: "can't load virtual object", code: 0, userInfo: nil)
+            completion(.failure(error))
+            return
+        }
+        referenceNode.load()
+        completion(.success(referenceNode))
+    }
+    
+    private func parseName(modelName: String) -> (name: String, extension: String)? {
+        let separate = modelName.components(separatedBy: ".")
+        if separate.count == 1 {
+            
+            return nil
+        }
+        guard let name = modelName.components(separatedBy: ".\(separate.last ?? "")").first,
+              let extensionModel = separate.last else {
+            
+            return nil
+        }
+        return (name, extensionModel)
+    }
 }

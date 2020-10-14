@@ -8,58 +8,33 @@
 import ARKit
 import SceneKit
 class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
-    struct ManualProbe {
-        // An environment probe for shading the virtual object.
-        var objectProbeAnchor: AREnvironmentProbeAnchor?
-        // A fallback environment probe encompassing the whole scene.
-        var sceneProbeAnchor: AREnvironmentProbeAnchor?
-        // Indicates whether manually placed probes need updating.
-        var requiresRefresh: Bool = true
-        // Tracks timing of manual probe updates to prevent updating too frequently.
-        var lastUpdateTime: TimeInterval = 0
-    }
     
-    var sceneView: ARSCNView!
+    private var sceneView: ARSCNView!
     
     
     // MARK: - ARKit Configuration Properties
     
-    // Model of shiny sphere that is added to the scene
-    var virtualObjectModel: SCNNode = {
-        guard let sceneURL = Bundle.main.url(forResource: "fender_stratocaster", withExtension: "usdz", subdirectory: "Models.scnassets/sphere"),
-            let referenceNode = SCNReferenceNode(url: sceneURL) else {
-                fatalError("can't load virtual object")
-        }
-        referenceNode.load()
-        
-        return referenceNode
-    }()
+
     
     // MARK: - Environment Texturing Configuration
     
     /// The virtual object that the user interacts with in the scene.
-    var virtualObject: SCNNode?
-    /// Object to manage the manual environment probe anchor and its state
-    var manualProbe: ManualProbe?
+    private var virtualObject: SCNNode?
     
-    /// Place environment probes manually or allow ARKit to place them automatically.
-    var environmentTexturingMode: ARWorldTrackingConfiguration.EnvironmentTexturing = .automatic {
-        didSet {
-            switch environmentTexturingMode {
-            case .manual:
-                manualProbe = ManualProbe()
-            default:
-                manualProbe = nil
-            }
-        }
-    }
+    /// Place environment probes automatically.
+    private var environmentTexturingMode: ARWorldTrackingConfiguration.EnvironmentTexturing = .automatic
+    
     
     /// Indicates whether ARKit has provided an environment texture.
-    var isEnvironmentTextureAvailable = false
+    private var isEnvironmentTextureAvailable = false
     
     /// The latest screen touch position when a pan gesture is active
-    var lastPanTouchPosition: CGPoint?
-    var autoScale: Bool = true
+    private var lastPanTouchPosition: CGPoint?
+    private var autoScale: Bool = true
+    
+    private var infoCallback: ((String?) -> Void)?
+    private var errorCallback: ((String?) -> Void)?
+    
     init(arSceneView: ARSCNView)
     {
         super.init()
@@ -86,6 +61,18 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         sceneView.session.pause()
     }
     
+    func setVirtualObject(object: SCNNode){
+        virtualObject = object
+    }
+    
+    func subscribeErrors(errors: ((String?) -> Void)?){
+        self.errorCallback = errors
+    }
+    
+    func subscribeInfoMessages(messages: ((String?) -> Void)?){
+        self.infoCallback = messages
+    }
+
     /// Runs the session with a new AR configuration to change modes or reset the experience.
     func resetTracking(autoScaleMode: Bool = true) {
         autoScale = autoScaleMode
@@ -133,11 +120,13 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
      
     }
     
-    func tap(_ gesture: UITapGestureRecognizer){
+    func tap(_ gesture: UITapGestureRecognizer?){
         
     }
     
     deinit {
         sceneView = nil
+        infoCallback = nil
+        errorCallback = nil
     }
 }

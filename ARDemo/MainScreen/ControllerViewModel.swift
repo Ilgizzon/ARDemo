@@ -11,16 +11,27 @@ import ARKit
 class ControllerViewModel: ViewModelControllerProtocol {
     
     weak var delegate: ViewControllerDelegate?
-    var arService: ARService?
-    var storageManager: StorageManager?
-    
+    private var arService: ARService?
+    private let storageQueque = DispatchQueue(label: "storage queue")
+    private let arQueque = DispatchQueue(label: "AR queue")
+    private var arState: ARState = .none
+    private var virtualModelState: VirtualModelState = .none
+    private var tempTapGesture: UITapGestureRecognizer?
     init(with delegate: ViewControllerDelegate) {
         self.delegate = delegate
+        storageQueque.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+            self.virtualModelState = .loading
+            self.loadVirtualObject()
+        }
     }
     
     
     func setupARView(with sceneView: ARSCNView) {
         arService = ARService(arSceneView: sceneView)
+        subscribeARListeners()
     }
     
     func pauseAR() {
@@ -32,7 +43,18 @@ class ControllerViewModel: ViewModelControllerProtocol {
     }
     
     func tap(_ gesture: UITapGestureRecognizer) {
-        arService?.tap(gesture)
+        
+        switch virtualModelState {
+        case .ready:
+            arService?.tap(gesture)
+            arState = . none
+        case .loading:
+            arState = .waitModel
+            tempTapGesture = gesture
+        case .none:
+            break
+        }
+        
     }
     
     func pan(_ gesture: UIPanGestureRecognizer) {
@@ -47,8 +69,57 @@ class ControllerViewModel: ViewModelControllerProtocol {
         arService?.rotation(gesture)
     }
     
+    private func loadVirtualObject(){
+        StorageManager.shared.load(modelName: "gramophone.usdz") {[weak self] (comletion: Result<SCNNode, Error>) in
+            guard let self = self else {
+                return
+            }
+            switch comletion {
+            case .success(let object):
+                self.arService?.setVirtualObject(object: object)
+                self.virtualModelState = .ready
+                switch self.arState {
+                
+                case .waitModel:
+                    self.arService?.tap(self.tempTapGesture)
+                case .none:
+                    break
+                }
+            case .failure(let error):
+                fatalError(error.localizedDescription)
+            }
+        }
+    }
+    
+    private func subscribeARListeners(){
+        
+        self.arService?.subscribeErrors {  [weak self] errors in
+            guard let self = self else {
+                return
+            }
+            self.delegate?.errorMessage(message: errors)
+        }
+        
+        self.arService?.subscribeInfoMessages {  [weak self] messages in
+            guard let self = self else {
+                return
+            }
+            self.delegate?.infoMessage(message: messages)
+        }
+    }
+    
+    private enum VirtualModelState {
+        case ready
+        case loading
+        case none
+    }
+    
+    private enum ARState {
+        case waitModel
+        case none
+    }
+    
     deinit {
-        storageManager = nil
         arService = nil
     }
 }

@@ -38,18 +38,18 @@ class ViewController: UIViewController {
     // MARK: - Session management
     
     @IBAction func changeMode(_ sender: UISegmentedControl) {
-        let autoScaleMode = sender.selectedSegmentIndex == 0
-        // Remove anchors and change scale mode
-        viewModel?.resetAR(autoScaleMode)
+        restartARSession()
     }
     
     @IBAction func restartExperience() {
-        
+        restartARSession()
+    }
+    
+    func restartARSession(){
         let autoScaleMode = autoscaleModeSelectionControl.selectedSegmentIndex == 0
         // Remove anchors and change scale mode
         viewModel?.resetAR(autoScaleMode)
     }
-    
     private func setupGestures(){
         let rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(self.rotation(_:)))
         self.view.addGestureRecognizer(rotationGesture)
@@ -84,9 +84,32 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: ViewControllerDelegate {
-    func infoMessage(message: String) {
-        print(message)
+    
+    func infoMessage(message: String?) {
+        // Show the message, or hide the label if there's no message.
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.25) {
+                self.sessionInfoLabel.text = message
+                if message != nil {
+                    self.sessionInfoView.alpha = 1
+                } else {
+                    self.sessionInfoView.alpha = 0
+                }
+            }
+        }
     }
     
+    func errorMessage(message: String?) {
+        DispatchQueue.main.async {
+            // Present an alert informing about the error that has occurred.
+            let alertController = UIAlertController(title: "The AR session failed.", message: message, preferredStyle: .alert)
+            let restartAction = UIAlertAction(title: "Restart Session", style: .default) { _ in
+                alertController.dismiss(animated: true, completion: nil)
+                self.restartARSession()
+            }
+            alertController.addAction(restartAction)
+            self.present(alertController, animated: true, completion: nil)
+        }
+    }
     
 }

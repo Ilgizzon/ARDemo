@@ -23,6 +23,7 @@ protocol ViewModelControllerProtocol: class {
 
 protocol ViewControllerDelegate: class {
     
-    func infoMessage(message: String)
+    func infoMessage(message: String?)
+    func errorMessage(message: String?)
     
 }
