@@ -19,6 +19,11 @@ class ViewController: UIViewController {
     
     var viewModel: ViewModelControllerProtocol?
     
+    init() {
+        super.init(nibName: "ViewController", bundle: .main)
+        
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel = ControllerViewModel(with: self)
@@ -80,7 +85,9 @@ class ViewController: UIViewController {
         viewModel?.tap(sender)
     }
     
-
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 extension ViewController: ViewControllerDelegate {
