@@ -23,7 +23,6 @@ class ControllerViewModel: ViewModelControllerProtocol {
             guard let self = self else {
                 return
             }
-            self.virtualModelState = .loading
             self.loadVirtualObject()
         }
     }
@@ -40,6 +39,7 @@ class ControllerViewModel: ViewModelControllerProtocol {
     
     func resetAR(_ autoScaleMode: Bool) {
         arService?.resetTracking(autoScaleMode: autoScaleMode)
+        self.loadVirtualObject()
     }
     
     func tap(_ gesture: UITapGestureRecognizer) {
@@ -70,6 +70,7 @@ class ControllerViewModel: ViewModelControllerProtocol {
     }
     
     private func loadVirtualObject(){
+        self.virtualModelState = .loading
         StorageManager.shared.load(modelName: "gramophone.usdz") {[weak self] (comletion: Result<SCNNode, Error>) in
             guard let self = self else {
                 return

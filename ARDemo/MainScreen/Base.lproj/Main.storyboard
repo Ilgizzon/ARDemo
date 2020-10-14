@@ -26,7 +26,7 @@
                                     <segment title="Off"/>
                                 </segments>
                                 <connections>
-                                    <action selector="changeMode:" destination="BV1-FR-VrT" eventType="touchUpInside" id="2Bz-bI-u70"/>
+                                    <action selector="changeMode:" destination="BV1-FR-VrT" eventType="valueChanged" id="0kV-MM-qF1"/>
                                 </connections>
                             </segmentedControl>
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="40a-5n-tcM">
