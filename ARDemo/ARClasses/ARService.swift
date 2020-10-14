@@ -20,7 +20,9 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
     
     /// The latest screen touch position when a pan gesture is active
     private var lastPanTouchPosition: CGPoint?
-    private var autoScale: Bool = true
+    private var autoScale = true
+    private var isRotating = false
+    private var currentAngleY: Float = 0
     
     private var infoCallback: ((String?) -> Void)?
     private var errorCallback: ((String?) -> Void)?
@@ -117,11 +119,15 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
 
     
     func pinch(_ gesture: UIPinchGestureRecognizer) {
-        
+        guard let object = virtualObject, gesture.state == .changed, let camera = sceneView.session.currentFrame?.camera, case .normal = camera.trackingState
+            else { return }
+        let newScale = object.simdScale * Float(gesture.scale)
+        object.simdScale = newScale
+        gesture.scale = 1.0
     }
     
     func pan(_ gesture: UIPanGestureRecognizer) {
-        guard let object = virtualObject else { return }
+        guard let object = virtualObject, !isRotating, let camera = sceneView.session.currentFrame?.camera, case .normal = camera.trackingState  else { return }
         
         switch gesture.state {
         case .changed:
@@ -147,7 +153,20 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
     }
     
     func rotation(_ gesture: UIRotationGestureRecognizer) {
-     
+        
+        guard let object = virtualObject, let camera = sceneView.session.currentFrame?.camera, case .normal = camera.trackingState else { return }
+        
+        let rotation = Float(gesture.rotation)
+
+        if gesture.state == .changed{
+            isRotating = true
+            object.eulerAngles.y = currentAngleY + rotation
+        }
+
+        if(gesture.state == .ended) {
+            currentAngleY = object.eulerAngles.y
+            isRotating = false
+        }
     }
     
     func tap(_ gesture: UITapGestureRecognizer?){
@@ -167,7 +186,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         
     }
     
-    func place(_ object: SCNNode, basedOn location: CGPoint) {
+    private func place(_ object: SCNNode, basedOn location: CGPoint) {
         guard let hitTestResult = sceneView.smartHitTest(location)
             else { return }
         
