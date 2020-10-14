@@ -71,7 +71,9 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
     /// Runs the session with a new AR configuration to change modes or reset the experience.
     func resetTracking(autoScaleMode: Bool = true) {
         autoScale = autoScaleMode
-        virtualObject?.removeFromParentNode()
+        sceneView.scene.rootNode.childNodes.forEach{
+            $0.removeFromParentNode()
+        }
         
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = .horizontal
