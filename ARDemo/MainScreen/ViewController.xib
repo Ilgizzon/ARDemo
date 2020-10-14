@@ -11,6 +11,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ViewController" customModule="ARDemo" customModuleProvider="target">
             <connections>
                 <outlet property="autoscaleModeSelectionControl" destination="0sI-Bc-Aff" id="nU2-DE-4uL"/>
+                <outlet property="envSelectionControl" destination="0pp-L0-Md0" id="DqL-4M-XU9"/>
                 <outlet property="modelSelectionControl" destination="cs8-bB-j9G" id="xbh-kx-OFV"/>
                 <outlet property="sceneView" destination="rjT-DH-XRV" id="jMj-qZ-9Yb"/>
                 <outlet property="sessionInfoLabel" destination="cEW-Tt-wPs" id="IIZ-6s-3GS"/>
@@ -60,7 +61,7 @@
                         <segment title="Off"/>
                     </segments>
                     <connections>
-                        <action selector="changeMode:" destination="-1" eventType="valueChanged" id="9FL-u7-O5m"/>
+                        <action selector="changeScaleMode:" destination="-1" eventType="valueChanged" id="UXt-mU-0I1"/>
                     </connections>
                 </segmentedControl>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Autoscale mode" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tak-Fw-WdH">
@@ -99,6 +100,22 @@
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="0pp-L0-Md0">
+                    <rect key="frame" x="139.5" y="688" width="135" height="32"/>
+                    <segments>
+                        <segment title="Auto"/>
+                        <segment title="Custom"/>
+                    </segments>
+                    <connections>
+                        <action selector="changeEnvModel:" destination="-1" eventType="valueChanged" id="UOo-cl-a5c"/>
+                    </connections>
+                </segmentedControl>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Environment mode" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qox-qr-y8M">
+                    <rect key="frame" x="135.5" y="659" width="143" height="21"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
             <viewLayoutGuide key="safeArea" id="rCp-3p-zII"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -107,14 +124,18 @@
                 <constraint firstItem="rjT-DH-XRV" firstAttribute="leading" secondItem="rCp-3p-zII" secondAttribute="leading" id="1Bz-R9-unq"/>
                 <constraint firstItem="0sI-Bc-Aff" firstAttribute="top" secondItem="Tak-Fw-WdH" secondAttribute="bottom" constant="8" symbolic="YES" id="3ZC-ks-bFi"/>
                 <constraint firstItem="0sI-Bc-Aff" firstAttribute="centerX" secondItem="GJl-kk-w0m" secondAttribute="centerX" id="8Dq-AN-JrC"/>
+                <constraint firstItem="0pp-L0-Md0" firstAttribute="top" secondItem="qox-qr-y8M" secondAttribute="bottom" constant="8" symbolic="YES" id="9lT-eA-Hw1"/>
                 <constraint firstItem="rCp-3p-zII" firstAttribute="bottom" secondItem="0sI-Bc-Aff" secondAttribute="bottom" constant="16" id="FLV-7a-v81"/>
                 <constraint firstItem="4S6-qP-7Qc" firstAttribute="centerX" secondItem="GJl-kk-w0m" secondAttribute="centerX" id="FcI-Bj-JYF"/>
+                <constraint firstItem="qox-qr-y8M" firstAttribute="centerX" secondItem="GJl-kk-w0m" secondAttribute="centerX" id="LYq-83-mfO"/>
                 <constraint firstItem="cs8-bB-j9G" firstAttribute="top" secondItem="4S6-qP-7Qc" secondAttribute="bottom" constant="8.5" id="PkC-ZF-ANB"/>
                 <constraint firstItem="rCp-3p-zII" firstAttribute="trailing" secondItem="9Wh-rN-2V7" secondAttribute="trailing" constant="16" id="TFT-QC-o6X"/>
+                <constraint firstItem="0pp-L0-Md0" firstAttribute="centerX" secondItem="GJl-kk-w0m" secondAttribute="centerX" id="US2-m2-uwf"/>
                 <constraint firstItem="rjT-DH-XRV" firstAttribute="top" secondItem="GJl-kk-w0m" secondAttribute="top" id="Ueq-19-5rf"/>
                 <constraint firstAttribute="bottom" secondItem="rjT-DH-XRV" secondAttribute="bottom" id="VIo-Jl-bGV"/>
                 <constraint firstItem="Gf2-4M-w7P" firstAttribute="leading" secondItem="rCp-3p-zII" secondAttribute="leading" constant="16" id="aCI-FN-chv"/>
                 <constraint firstItem="9Wh-rN-2V7" firstAttribute="top" secondItem="rCp-3p-zII" secondAttribute="top" constant="8" id="b0J-7s-6tE"/>
+                <constraint firstItem="4S6-qP-7Qc" firstAttribute="top" secondItem="0pp-L0-Md0" secondAttribute="bottom" constant="9" id="faS-7H-vXr"/>
                 <constraint firstItem="Tak-Fw-WdH" firstAttribute="centerX" secondItem="GJl-kk-w0m" secondAttribute="centerX" id="gzM-vr-Zpn"/>
                 <constraint firstItem="Tak-Fw-WdH" firstAttribute="firstBaseline" secondItem="cs8-bB-j9G" secondAttribute="baseline" constant="24.5" symbolType="layoutAnchor" id="hLe-4Z-p7X"/>
                 <constraint firstItem="cs8-bB-j9G" firstAttribute="centerX" secondItem="GJl-kk-w0m" secondAttribute="centerX" id="kMn-5K-3Hm"/>

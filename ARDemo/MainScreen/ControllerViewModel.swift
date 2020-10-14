@@ -40,9 +40,9 @@ class ControllerViewModel: ViewModelControllerProtocol {
         arService?.pauseSession()
     }
     
-    func resetAR(_ autoScaleMode: Bool, model: SetCurrentModel) {
+    func resetAR(_ autoScaleMode: Bool, model: SetCurrentModel, envMode: ARWorldTrackingConfiguration.EnvironmentTexturing) {
         currentModel = model
-        arService?.resetTracking(autoScaleMode: autoScaleMode)
+        arService?.resetTracking(autoScaleMode: autoScaleMode, environmentMode: envMode)
         self.loadVirtualObject()
     }
     
