@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var sessionInfoLabel: UILabel!
     @IBOutlet weak var sessionInfoView: UIVisualEffectView!
     @IBOutlet weak var autoscaleModeSelectionControl: UISegmentedControl!
+    @IBOutlet weak var modelSelectionControl: UISegmentedControl!
     
     var viewModel: ViewModelControllerProtocol?
     
@@ -46,14 +47,29 @@ class ViewController: UIViewController {
         restartARSession()
     }
     
+    @IBAction func changeModel(_ sender: UISegmentedControl) {
+        restartARSession()
+    }
+    
     @IBAction func restartExperience() {
         restartARSession()
     }
     
     func restartARSession(){
         let autoScaleMode = autoscaleModeSelectionControl.selectedSegmentIndex == 0
-        // Remove anchors and change scale mode
-        viewModel?.resetAR(autoScaleMode)
+        var selectedModel: SetCurrentModel = .gramophone
+        // Remove anchors, change scale mode, set virtual object
+        switch modelSelectionControl.selectedSegmentIndex {
+        case 0:
+            selectedModel = .gramophone
+        case 1:
+            selectedModel = .bike
+        case 2:
+            selectedModel = .lizardman
+        default:
+            break
+        }
+        viewModel?.resetAR(autoScaleMode, model: selectedModel)
     }
     private func setupGestures(){
         let rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(self.rotation(_:)))
