@@ -189,9 +189,9 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         let boundingBox = object.boundingBox
         
         
-        let xSize: Float = fabs( boundingBox.max.x - boundingBox.min.x )
-        let ySize: Float = fabs( boundingBox.max.y - boundingBox.min.y )
-        let zSize: Float = fabs( boundingBox.max.z - boundingBox.min.z )
+        let xSize: Float = abs( boundingBox.max.x - boundingBox.min.x )
+        let ySize: Float = abs( boundingBox.max.y - boundingBox.min.y )
+        let zSize: Float = abs( boundingBox.max.z - boundingBox.min.z )
 
         var scale: Float = 0
 
