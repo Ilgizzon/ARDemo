@@ -10,7 +10,10 @@ import ARKit
 
 class ControllerViewModel: ViewModelControllerProtocol {
     
+
+    
     weak var delegate: ViewControllerDelegate?
+    private var currentModel: SetCurrentModel = .gramophone
     private var arService: ARService?
     private let storageQueque = DispatchQueue(label: "storage queue")
     private let arQueque = DispatchQueue(label: "AR queue")
@@ -37,7 +40,8 @@ class ControllerViewModel: ViewModelControllerProtocol {
         arService?.pauseSession()
     }
     
-    func resetAR(_ autoScaleMode: Bool) {
+    func resetAR(_ autoScaleMode: Bool, model: SetCurrentModel) {
+        currentModel = model
         arService?.resetTracking(autoScaleMode: autoScaleMode)
         self.loadVirtualObject()
     }
@@ -75,7 +79,7 @@ class ControllerViewModel: ViewModelControllerProtocol {
     
     private func loadVirtualObject(){
         self.virtualModelState = .loading
-        StorageManager.shared.load(modelName: "gramophone.usdz") {[weak self] (comletion: Result<SCNNode, Error>) in
+        StorageManager.shared.load(modelName: currentModel.rawValue) {[weak self] (comletion: Result<SCNNode, Error>) in
             guard let self = self else {
                 return
             }

@@ -8,12 +8,17 @@
 import Foundation
 import ARKit
 
+public enum SetCurrentModel: String {
+    case gramophone = "gramophone.usdz"
+    case bike = "Bike.usdz"
+    case lizardman = "Lizardman.usdz"
+}
 protocol ViewModelControllerProtocol: class {
-    
+
     var delegate: ViewControllerDelegate? { get }
     func setupARView(with sceneView: ARSCNView)
     func pauseAR()
-    func resetAR(_ autoScaleMode: Bool)
+    func resetAR(_ autoScaleMode: Bool, model: SetCurrentModel)
     func tap(_ gesture: UITapGestureRecognizer)
     func pan(_ gesture: UIPanGestureRecognizer)
     func pinch(_ gesture: UIPinchGestureRecognizer)
