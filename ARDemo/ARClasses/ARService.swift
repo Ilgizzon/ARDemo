@@ -157,7 +157,10 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
             guard let hitTestResult = sceneView.smartHitTest(touchLocation), let translation = sceneView.session.raycast(hitTestResult).first?.worldTransform.translation else {
                 return
             }
-            object.simdPosition = translation
+            DispatchQueue.main.async {
+                object.simdPosition = translation
+            }
+            
         } else {
             self.place(object, basedOn: touchLocation)
         }
@@ -167,13 +170,20 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
     func place(_ object: SCNNode, basedOn location: CGPoint) {
         guard let hitTestResult = sceneView.smartHitTest(location)
             else { return }
-        sceneView.scene.rootNode.addChildNode(object)
+        
         
         let result = sceneView.session.raycast(hitTestResult)
         guard let transition = result.first?.worldTransform.translation else {
             return
         }
-        object.simdPosition = transition
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+            self.sceneView.scene.rootNode.addChildNode(object)
+            object.simdPosition = transition
+        }
+        
         
         
         guard let frame = sceneView.session.currentFrame else { return }

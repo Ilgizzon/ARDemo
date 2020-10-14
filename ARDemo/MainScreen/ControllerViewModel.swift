@@ -44,17 +44,21 @@ class ControllerViewModel: ViewModelControllerProtocol {
     
     func tap(_ gesture: UITapGestureRecognizer) {
         
-        switch virtualModelState {
-        case .ready:
-            arService?.tap(gesture)
-            arState = . none
-        case .loading:
-            arState = .waitModel
-            tempTapGesture = gesture
-        case .none:
-            break
-        }
-        
+            switch self.virtualModelState {
+            case .ready:
+                arQueque.async { [weak self] in
+                    guard let self = self else {
+                        return
+                    }
+                    self.arService?.tap(gesture)
+                }
+                arState = . none
+            case .loading:
+                arState = .waitModel
+                tempTapGesture = gesture
+            case .none:
+                break
+            }
     }
     
     func pan(_ gesture: UIPanGestureRecognizer) {
@@ -82,7 +86,13 @@ class ControllerViewModel: ViewModelControllerProtocol {
                 switch self.arState {
                 
                 case .waitModel:
-                    self.arService?.tap(self.tempTapGesture)
+                    self.arQueque.async { [weak self] in
+                        guard let self = self else {
+                            return
+                        }
+                        self.arService?.tap(self.tempTapGesture)
+                    }
+                    
                 case .none:
                     break
                 }
