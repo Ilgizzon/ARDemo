@@ -16,7 +16,6 @@ class ControllerViewModel: ViewModelControllerProtocol {
     private var currentModel: SetCurrentModel = .gramophone
     private var arService: ARService?
     private let storageQueque = DispatchQueue(label: "storage queue")
-    private let arQueque = DispatchQueue(label: "AR queue")
     private var arState: ARState = .none
     private var virtualModelState: VirtualModelState = .none
     private var tempTapGesture: UITapGestureRecognizer?
@@ -48,21 +47,16 @@ class ControllerViewModel: ViewModelControllerProtocol {
     
     func tap(_ gesture: UITapGestureRecognizer) {
         
-            switch self.virtualModelState {
-            case .ready:
-                arQueque.async { [weak self] in
-                    guard let self = self else {
-                        return
-                    }
-                    self.arService?.tap(gesture)
-                }
-                arState = . none
-            case .loading:
-                arState = .waitModel
-                tempTapGesture = gesture
-            case .none:
-                break
-            }
+        switch self.virtualModelState {
+        case .ready:
+            self.arService?.tap(gesture)
+            arState = . none
+        case .loading:
+            arState = .waitModel
+            tempTapGesture = gesture
+        case .none:
+            break
+        }
     }
     
     func pan(_ gesture: UIPanGestureRecognizer) {
@@ -90,13 +84,7 @@ class ControllerViewModel: ViewModelControllerProtocol {
                 switch self.arState {
                 
                 case .waitModel:
-                    self.arQueque.async { [weak self] in
-                        guard let self = self else {
-                            return
-                        }
-                        self.arService?.tap(self.tempTapGesture)
-                    }
-                    
+                    self.arService?.tap(self.tempTapGesture)
                 case .none:
                     break
                 }

@@ -258,8 +258,11 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
                                                     camera: pointOfView
         )
         scale = desiredSize/objectSize
-        object.scale = SCNVector3( scale, scale, scale )
-        object.opacity = 1
+        DispatchQueue.main.async {
+            object.scale = SCNVector3( scale, scale, scale )
+            object.opacity = 1
+        }
+
       
     }
     
