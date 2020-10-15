@@ -38,7 +38,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         runSession()
         
     }
-    /// - Tag: RunARSession
+    // MARK: - RunARSession
     private func runSession(){
         // Prevent the screen from dimming to avoid interrupting the AR experience.
         UIApplication.shared.isIdleTimerDisabled = true
@@ -51,11 +51,11 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         sceneView.session.run(configuration)
     }
     
-    /// - Tag: PauseARSession
+    // MARK: - PauseARSession
     func pauseSession(){
         sceneView.session.pause()
     }
-    
+    // MARK: - Put virtual model on scene
     func setVirtualObject(object: SCNNode){
         virtualObject = object
         modelOnScene = false
@@ -63,6 +63,8 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
             $0.removeFromParentNode()
         }
     }
+    
+    // MARK: -  Errors and life-cycle callbacks
     
     func subscribeErrors(errors: ((String?) -> Void)?){
         self.errorCallback = errors
@@ -72,7 +74,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         self.infoCallback = messages
     }
 
-    /// Runs the session with a new AR configuration to change modes.
+    // MARK: -  Runs the session with a new AR configuration to change modes.
     func resetTracking(
         autoScaleMode: Bool = true,
         environmentMode: ARWorldTrackingConfiguration.EnvironmentTexturing = .automatic
@@ -256,7 +258,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         }
         
     }
-    
+    // MARK: - Put virtual model on scene
     private func place(
         _ object: SCNNode,
         currentPosition: CGPoint
@@ -300,7 +302,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
             )
         }
     }
-        
+    // MARK: - Autoscale virtual model
     private func setAutoScaleAndPosition(
         object: SCNNode,
         pointOfView: SCNNode?
@@ -328,7 +330,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
 
       
     }
-    
+    // MARK: - Сalculate the distance between the virtual model and the camera
     private func estimateDesiredSize(
         object: SCNNode,
         camera: SCNNode?
@@ -347,7 +349,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         return desiredSize > 10 ? 10 : desiredSize // should not be more than 10m
     }
     
-    /// Provide feedback on the state of the AR experience.
+    // MARK: - Provide feedback on the state of the AR experience.
     private func updateSessionInfo( trackingState: ARCamera.TrackingState) {
         let message: String?
         
@@ -370,7 +372,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         }
         infoCallback?(message)
     }
-    
+    // MARK: - Calculate ARRaycastResult.
     private func getARRaycastResults(
         currentPosition: CGPoint,
         completion: @escaping (ARRaycastResult?) -> Void

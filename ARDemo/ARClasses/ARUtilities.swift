@@ -50,6 +50,8 @@ extension ARSCNView {
     
 }
 
+// MARK: - SCNNode extensions
+
 extension SCNNode {
     var extents: SIMD3<Float> {
         let (min, max) = boundingBox
@@ -90,7 +92,8 @@ extension SCNScene {
                 let environmentMap = UIImage(named: environmentPath)
                 self.lightingEnvironment.contents = environmentMap
             } else {
-                fatalError("Can't set environment")
+                self.lightingEnvironment.contents = UIColor.white
+                fatalError("Can't put environment")
             }
             self.lightingEnvironment.intensity = intensity
         }

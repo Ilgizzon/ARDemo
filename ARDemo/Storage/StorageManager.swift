@@ -11,6 +11,9 @@ class StorageManager {
     
     public static let shared = StorageManager()
     /// Loading model
+    /// - Parameters:
+    ///     - modelName: full name with extension
+    ///     - completion: returns a virtual object if the load was successful otherwise returns an error
     func load(
         modelName: String,
         completion: @escaping (Result<SCNNode, Error>) -> Void
@@ -43,6 +46,7 @@ class StorageManager {
         completion(.success(referenceNode))
     }
     
+    // MARK: Parsing name and returns the name and extension separately
     private func parseName(modelName: String) ->   (
                                                     name: String,
                                                     extension: String

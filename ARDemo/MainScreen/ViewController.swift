@@ -87,6 +87,8 @@ class ViewController: UIViewController {
             envMode: envMode
         )
     }
+    
+    // MARK: - Cnfigure Gestures
     private func setupGestures(){
         let rotationGesture = UIRotationGestureRecognizer(
             target: self,
@@ -139,7 +141,7 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: ViewControllerDelegate {
-    
+    // MARK: - ViewControllerDelegate
     func infoMessage(message: String?) {
         // Show the message, or hide the label if there's no message.
         DispatchQueue.main.async {

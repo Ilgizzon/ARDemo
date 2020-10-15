@@ -16,6 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        // MARK: - Put controller to main window
         window = UIWindow(frame: UIScreen.main.bounds)
         let viewController = ViewController()
         window!.rootViewController = viewController
