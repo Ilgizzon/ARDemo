@@ -21,12 +21,7 @@ class ControllerViewModel: ViewModelControllerProtocol {
     private var tempTapGesture: UITapGestureRecognizer?
     init(with delegate: ViewControllerDelegate) {
         self.delegate = delegate
-        storageQueque.async { [weak self] in
-            guard let self = self else {
-                return
-            }
-            self.loadVirtualObject()
-        }
+        self.loadVirtualObject()
     }
     
     
@@ -73,23 +68,28 @@ class ControllerViewModel: ViewModelControllerProtocol {
     
     private func loadVirtualObject(){
         self.virtualModelState = .loading
-        StorageManager.shared.load(modelName: currentModel.rawValue) {[weak self] (comletion: Result<SCNNode, Error>) in
+        storageQueque.async { [weak self] in
             guard let self = self else {
                 return
             }
-            switch comletion {
-            case .success(let object):
-                self.arService?.setVirtualObject(object: object)
-                self.virtualModelState = .ready
-                switch self.arState {
-                
-                case .waitModel:
-                    self.arService?.tap(self.tempTapGesture)
-                case .none:
-                    break
+            StorageManager.shared.load(modelName: self.currentModel.rawValue) {[weak self] (comletion: Result<SCNNode, Error>) in
+                guard let self = self else {
+                    return
                 }
-            case .failure(let error):
-                fatalError(error.localizedDescription)
+                switch comletion {
+                case .success(let object):
+                    self.arService?.setVirtualObject(object: object)
+                    self.virtualModelState = .ready
+                    switch self.arState {
+                    
+                    case .waitModel:
+                        self.arService?.tap(self.tempTapGesture)
+                    case .none:
+                        break
+                    }
+                case .failure(let error):
+                    fatalError(error.localizedDescription)
+                }
             }
         }
     }
