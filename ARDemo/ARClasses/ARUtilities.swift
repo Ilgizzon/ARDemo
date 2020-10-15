@@ -23,17 +23,29 @@ extension ARSCNView {
     
     func smartHitTest(_ point: CGPoint) -> ARRaycastQuery? {
         // 1. Check for a result on an existing plane using geometry.
-        if let existingPlaneUsingGeometryResult = self.raycastQuery(from: point, allowing: .existingPlaneGeometry, alignment: .horizontal) {
+        if let existingPlaneUsingGeometryResult = self.raycastQuery(
+            from: point,
+            allowing: .existingPlaneGeometry,
+            alignment: .horizontal
+        ) {
             return existingPlaneUsingGeometryResult
         }
         
         // 2. Check for a result on an existing plane, assuming its dimensions are infinite.
-        if let infinitePlaneResult = self.raycastQuery(from: point, allowing: .existingPlaneInfinite, alignment: .horizontal) {
+        if let infinitePlaneResult = self.raycastQuery(
+            from: point,
+            allowing: .existingPlaneInfinite,
+            alignment: .horizontal
+        ) {
             return infinitePlaneResult
         }
         
         // 3. As a final fallback, check for a result on estimated planes.
-        return self.raycastQuery(from: point, allowing: .estimatedPlane, alignment: .horizontal)
+        return self.raycastQuery(
+            from: point,
+            allowing: .estimatedPlane,
+            alignment: .horizontal
+        )
     }
     
 }
@@ -64,15 +76,21 @@ extension float4x4 {
 // MARK: - Scene extensions
 
 extension SCNScene {
-    func enableEnvironmentMapWithIntensity(_ intensity: CGFloat, queue: DispatchQueue) {
-        queue.async {  [weak self] in
+    func enableEnvironmentMapWithIntensity(
+        _ intensity: CGFloat,
+        environmentPath: String,
+        queue: DispatchQueue
+    ) {
+        queue.async { [weak self] in
             
             guard let self = self else {
                 return
             }
             if self.lightingEnvironment.contents == nil {
-                let environmentMap = UIImage(named: "art.scnassets/environment.jpg")
+                let environmentMap = UIImage(named: environmentPath)
                 self.lightingEnvironment.contents = environmentMap
+            } else {
+                fatalError("Can't set environment")
             }
             self.lightingEnvironment.intensity = intensity
         }
