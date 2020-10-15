@@ -28,6 +28,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
     private var infoCallback: ((String?) -> Void)?
     private var errorCallback: ((String?) -> Void)?
     private var modelOnScene = false
+    
     init(arSceneView: ARSCNView)
     {
         super.init()
@@ -37,7 +38,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         runSession()
         
     }
-    /// - Tag: RunARSession
+    // MARK: - RunARSession
     private func runSession(){
         // Prevent the screen from dimming to avoid interrupting the AR experience.
         UIApplication.shared.isIdleTimerDisabled = true
@@ -50,11 +51,11 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         sceneView.session.run(configuration)
     }
     
-    /// - Tag: PauseARSession
+    // MARK: - PauseARSession
     func pauseSession(){
         sceneView.session.pause()
     }
-    
+    // MARK: - Put virtual model on scene
     func setVirtualObject(object: SCNNode){
         virtualObject = object
         modelOnScene = false
@@ -62,6 +63,8 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
             $0.removeFromParentNode()
         }
     }
+    
+    // MARK: -  Errors and life-cycle callbacks
     
     func subscribeErrors(errors: ((String?) -> Void)?){
         self.errorCallback = errors
@@ -71,8 +74,12 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         self.infoCallback = messages
     }
 
-    /// Runs the session with a new AR configuration to change modes.
-    func resetTracking(autoScaleMode: Bool = true, environmentMode: ARWorldTrackingConfiguration.EnvironmentTexturing = .automatic) {
+    // MARK: -  Runs the session with a new AR configuration to change modes.
+    func resetTracking(
+        autoScaleMode: Bool = true,
+        environmentMode: ARWorldTrackingConfiguration.EnvironmentTexturing = .automatic
+    ) {
+        
         environmentTexturingMode = environmentMode
         autoScale = autoScaleMode
         sceneView.scene.rootNode.childNodes.forEach{
@@ -81,28 +88,50 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = .horizontal
-        configuration.isLightEstimationEnabled = environmentTexturingMode == .automatic ? true: false
+        configuration.isLightEstimationEnabled =
+            environmentTexturingMode == .automatic ? true: false
+        
         configuration.environmentTexturing = environmentTexturingMode
-        sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+        sceneView.session.run(
+            configuration,
+            options: [.resetTracking, .removeExistingAnchors]
+        )
+        
         modelOnScene = false
     }
     
     // MARK: - ARSCNViewDelegate
-    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+    func renderer(
+        _ renderer: SCNSceneRenderer,
+        didAdd node: SCNNode,
+        for anchor: ARAnchor
+    ) {
         planeDetected = true
     }
     
-    func renderer(_ renderer: SCNSceneRenderer, didRemove node: SCNNode, for anchor: ARAnchor) {
+    func renderer(
+        _ renderer: SCNSceneRenderer,
+        didRemove node: SCNNode,
+        for anchor: ARAnchor
+    ) {
         planeDetected = false
     }
     // MARK: - ARSessionObserver
     
-    func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
-        guard let _ = session.currentFrame else { fatalError("ARSession should have an ARFrame") }
+    func session(
+        _ session: ARSession,
+        cameraDidChangeTrackingState camera: ARCamera
+    ) {
+        guard let _ = session.currentFrame
+        else { fatalError("ARSession should have an ARFrame") }
+        
         updateSessionInfo(trackingState: camera.trackingState)
     }
     
-    func session(_ session: ARSession, didFailWithError error: Error) {
+    func session(
+        _ session: ARSession,
+        didFailWithError error: Error
+    ) {
         guard error is ARError else { return }
         
         let errorWithInfo = error as NSError
@@ -119,35 +148,50 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
     
     // MARK: ARSessionDelegate
     
-    func session(_ session: ARSession, didUpdate frame: ARFrame) {
+    func session(
+        _ session: ARSession,
+        didUpdate frame: ARFrame
+    ) {
         updateSessionInfo(trackingState: frame.camera.trackingState)
     }
     
     // MARK: - Gesture Recognizers
     
-
-    
     func pinch(_ gesture: UIPinchGestureRecognizer) {
-        guard let object = virtualObject, gesture.state == .changed, let camera = sceneView.session.currentFrame?.camera, case .normal = camera.trackingState
-            else { return }
+        guard let object = virtualObject,
+              gesture.state == .changed,
+              let camera = sceneView.session.currentFrame?.camera,
+              case .normal = camera.trackingState
+        else { return }
+        
         let newScale = object.simdScale * Float(gesture.scale)
         object.simdScale = newScale
         gesture.scale = 1.0
     }
     
     func pan(_ gesture: UIPanGestureRecognizer) {
-        guard let object = virtualObject, !isRotating, let camera = sceneView.session.currentFrame?.camera, case .normal = camera.trackingState  else { return }
+        guard let object = virtualObject,
+              !isRotating,
+              let camera = sceneView.session.currentFrame?.camera,
+              case .normal = camera.trackingState
+        else { return }
         
         switch gesture.state {
         case .changed:
             let translation = gesture.translation(in: sceneView)
             
-            let previousPosition = lastTouchPosition ?? CGPoint(sceneView.projectPoint(object.position))
+            let previousPosition =
+                lastTouchPosition ?? CGPoint(sceneView.projectPoint(object.position))
             // Calculate the new touch position
-            let currentPosition = CGPoint(x: previousPosition.x + translation.x, y: previousPosition.y + translation.y)
+            let currentPosition = CGPoint(
+                x: previousPosition.x + translation.x,
+                y: previousPosition.y + translation.y
+            )
             
             
-            getARRaycastResults(currentPosition: currentPosition) { optionalResult in
+            getARRaycastResults(currentPosition: currentPosition)
+            { optionalResult in
+                
                 guard let result = optionalResult else {
                     return
                 }
@@ -166,7 +210,10 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
     
     func rotation(_ gesture: UIRotationGestureRecognizer) {
         
-        guard let object = virtualObject, let camera = sceneView.session.currentFrame?.camera, case .normal = camera.trackingState else { return }
+        guard let object = virtualObject,
+              let camera = sceneView.session.currentFrame?.camera,
+              case .normal = camera.trackingState
+        else { return }
         
         let rotation = Float(gesture.rotation)
 
@@ -182,12 +229,18 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
     }
     
     func tap(_ gesture: UITapGestureRecognizer?){
-        guard let object = virtualObject, let camera = sceneView.session.currentFrame?.camera, let strongGesture = gesture, case .normal = camera.trackingState else { return }
+        guard let object = virtualObject,
+              let camera = sceneView.session.currentFrame?.camera,
+              let strongGesture = gesture,
+              case .normal = camera.trackingState
+        else { return }
         
         let currentPosition = strongGesture.location(in: sceneView)
 
         if modelOnScene {
-            getARRaycastResults(currentPosition: currentPosition) { optionalResult in
+            getARRaycastResults(currentPosition: currentPosition)
+            { optionalResult in
+                
                 guard let result = optionalResult else {
                     return
                 }
@@ -198,20 +251,30 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
 
             
         } else {
-            self.place(object, currentPosition: currentPosition)
+            self.place(
+                object,
+                currentPosition: currentPosition
+            )
         }
         
     }
-    
-    private func place(_ object: SCNNode, currentPosition: CGPoint) {
+    // MARK: - Put virtual model on scene
+    private func place(
+        _ object: SCNNode,
+        currentPosition: CGPoint
+    ) {
 
         if environmentTexturingMode != .automatic {
-            sceneView.scene.enableEnvironmentMapWithIntensity(5, queue: DispatchQueue.main)
+            sceneView.scene.enableEnvironmentMapWithIntensity(
+                5,
+                environmentPath: "art.scnassets/environment.jpg",
+                queue: DispatchQueue.main
+            )
         }
         
-
-
-        getARRaycastResults(currentPosition: currentPosition) { optionalResult in
+        getARRaycastResults(currentPosition: currentPosition)
+        { optionalResult in
+            
             guard let result = optionalResult else {
                 return
             }
@@ -233,30 +296,32 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         guard let frame = sceneView.session.currentFrame else { return }
         updateSessionInfo(trackingState: frame.camera.trackingState)
         if autoScale {
-            setAutoScaleAndPosition(object: object, pointOfView: sceneView.pointOfView)
+            setAutoScaleAndPosition(
+                object: object,
+                pointOfView: sceneView.pointOfView
+            )
         }
     }
-        
-    private func setAutoScaleAndPosition(object: SCNNode,
-                                  pointOfView: SCNNode?
+    // MARK: - Autoscale virtual model
+    private func setAutoScaleAndPosition(
+        object: SCNNode,
+        pointOfView: SCNNode?
     ) {
 
-        
         let boundingBox = object.boundingBox
-        
-        
+
         let xSize: Float = abs( boundingBox.max.x - boundingBox.min.x )
         let ySize: Float = abs( boundingBox.max.y - boundingBox.min.y )
         let zSize: Float = abs( boundingBox.max.z - boundingBox.min.z )
 
         var scale: Float = 0
-
         
         // ok, we need to automatically resize, this is an AR character:
         let objectSize: Float = max( xSize, zSize, ySize )
         let desiredSize = self.estimateDesiredSize( object: object,
                                                     camera: pointOfView
         )
+        
         scale = desiredSize/objectSize
         DispatchQueue.main.async {
             object.scale = SCNVector3( scale, scale, scale )
@@ -265,9 +330,10 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
 
       
     }
-    
-    private func estimateDesiredSize( object: SCNNode,
-                              camera: SCNNode?
+    // MARK: - Сalculate the distance between the virtual model and the camera
+    private func estimateDesiredSize(
+        object: SCNNode,
+        camera: SCNNode?
     ) -> Float {
         
         let modelPos  = object.worldPosition
@@ -283,7 +349,7 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         return desiredSize > 10 ? 10 : desiredSize // should not be more than 10m
     }
     
-    /// Provide feedback on the state of the AR experience.
+    // MARK: - Provide feedback on the state of the AR experience.
     private func updateSessionInfo( trackingState: ARCamera.TrackingState) {
         let message: String?
         
@@ -306,8 +372,11 @@ class ARService: NSObject, ARSCNViewDelegate, ARSessionDelegate {
         }
         infoCallback?(message)
     }
-    
-    private func getARRaycastResults(currentPosition: CGPoint ,completion: @escaping (ARRaycastResult?) -> Void){
+    // MARK: - Calculate ARRaycastResult.
+    private func getARRaycastResults(
+        currentPosition: CGPoint,
+        completion: @escaping (ARRaycastResult?) -> Void
+    ){
 
         if let hitTestResult = sceneView.smartHitTest(currentPosition){
             

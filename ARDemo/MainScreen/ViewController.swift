@@ -22,7 +22,10 @@ class ViewController: UIViewController {
     var viewModel: ViewModelControllerProtocol?
     
     init() {
-        super.init(nibName: "ViewController", bundle: .main)
+        super.init(
+            nibName: "ViewController",
+            bundle: .main
+        )
         
     }
     
@@ -65,7 +68,8 @@ class ViewController: UIViewController {
     func restartARSession(){
         let autoScaleMode = autoscaleModeSelectionControl.selectedSegmentIndex == 0
         var selectedModel: SetCurrentModel = .gramophone
-        let envMode: ARWorldTrackingConfiguration.EnvironmentTexturing = envSelectionControl.selectedSegmentIndex == 0 ? .automatic : .none
+        let envMode: ARWorldTrackingConfiguration.EnvironmentTexturing =
+            envSelectionControl.selectedSegmentIndex == 0 ? .automatic : .none
         // Remove anchors, change scale mode, set virtual object
         switch modelSelectionControl.selectedSegmentIndex {
         case 0:
@@ -77,19 +81,41 @@ class ViewController: UIViewController {
         default:
             break
         }
-        viewModel?.resetAR(autoScaleMode, model: selectedModel, envMode: envMode)
+        viewModel?.resetAR(
+            autoScaleMode,
+            model: selectedModel,
+            envMode: envMode
+        )
     }
+    
+    // MARK: - Cnfigure Gestures
     private func setupGestures(){
-        let rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(self.rotation(_:)))
+        let rotationGesture = UIRotationGestureRecognizer(
+            target: self,
+            action: #selector(self.rotation(_:))
+        )
+        
         self.view.addGestureRecognizer(rotationGesture)
         
-        let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(self.pinch(_:)))
+        let pinchGesture = UIPinchGestureRecognizer(
+            target: self,
+            action: #selector(self.pinch(_:))
+        )
+        
         self.view.addGestureRecognizer(pinchGesture)
         
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(self.pan(_:)))
+        let panGesture = UIPanGestureRecognizer(
+            target: self,
+            action: #selector(self.pan(_:))
+        )
+        
         self.view.addGestureRecognizer(panGesture)
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.tap(_:)))
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(self.tap(_:))
+        )
+        
         self.view.addGestureRecognizer(tapGesture)
     }
     
@@ -115,7 +141,7 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: ViewControllerDelegate {
-    
+    // MARK: - ViewControllerDelegate
     func infoMessage(message: String?) {
         // Show the message, or hide the label if there's no message.
         DispatchQueue.main.async {
@@ -133,13 +159,32 @@ extension ViewController: ViewControllerDelegate {
     func errorMessage(message: String?) {
         DispatchQueue.main.async {
             // Present an alert informing about the error that has occurred.
-            let alertController = UIAlertController(title: "The AR session failed.", message: message, preferredStyle: .alert)
-            let restartAction = UIAlertAction(title: "Restart Session", style: .default) { _ in
-                alertController.dismiss(animated: true, completion: nil)
+            let alertController = UIAlertController(
+                title: "The AR session failed.",
+                message: message,
+                preferredStyle: .alert
+            )
+            
+            let restartAction = UIAlertAction(
+                title: "Restart Session",
+                style: .default
+            ) { _ in
+                
+                alertController.dismiss(
+                    animated: true,
+                    completion: nil
+                )
+                
                 self.restartARSession()
             }
             alertController.addAction(restartAction)
-            self.present(alertController, animated: true, completion: nil)
+            
+            self.present(
+                alertController,
+                animated: true,
+                completion: nil
+            )
+            
         }
     }
     

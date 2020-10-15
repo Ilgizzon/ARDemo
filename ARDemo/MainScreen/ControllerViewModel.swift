@@ -34,9 +34,17 @@ class ControllerViewModel: ViewModelControllerProtocol {
         arService?.pauseSession()
     }
     
-    func resetAR(_ autoScaleMode: Bool, model: SetCurrentModel, envMode: ARWorldTrackingConfiguration.EnvironmentTexturing) {
+    func resetAR(
+        _ autoScaleMode: Bool,
+        model: SetCurrentModel,
+        envMode: ARWorldTrackingConfiguration.EnvironmentTexturing
+    ) {
         currentModel = model
-        arService?.resetTracking(autoScaleMode: autoScaleMode, environmentMode: envMode)
+        arService?.resetTracking(
+            autoScaleMode: autoScaleMode,
+            environmentMode: envMode
+        )
+        
         self.loadVirtualObject()
     }
     
@@ -72,7 +80,9 @@ class ControllerViewModel: ViewModelControllerProtocol {
             guard let self = self else {
                 return
             }
-            StorageManager.shared.load(modelName: self.currentModel.rawValue) {[weak self] (comletion: Result<SCNNode, Error>) in
+            StorageManager.shared.load(modelName: self.currentModel.rawValue)
+            {[weak self] (comletion: Result<SCNNode, Error>) in
+                
                 guard let self = self else {
                     return
                 }
@@ -96,14 +106,18 @@ class ControllerViewModel: ViewModelControllerProtocol {
     
     private func subscribeARListeners(){
         
-        self.arService?.subscribeErrors {  [weak self] errors in
+        self.arService?.subscribeErrors
+        {[weak self] errors in
+            
             guard let self = self else {
                 return
             }
             self.delegate?.errorMessage(message: errors)
         }
         
-        self.arService?.subscribeInfoMessages {  [weak self] messages in
+        self.arService?.subscribeInfoMessages
+        {[weak self] messages in
+            
             guard let self = self else {
                 return
             }
