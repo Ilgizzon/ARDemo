@@ -91,9 +91,6 @@ extension SCNScene {
             if self.lightingEnvironment.contents == nil {
                 let environmentMap = UIImage(named: environmentPath)
                 self.lightingEnvironment.contents = environmentMap
-            } else {
-                self.lightingEnvironment.contents = UIColor.white
-                fatalError("Can't put environment")
             }
             self.lightingEnvironment.intensity = intensity
         }
